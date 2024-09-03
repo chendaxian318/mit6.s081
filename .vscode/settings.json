@@ -1,0 +1,7 @@
+{
+    "C_Cpp.autocomplete": "default",
+    "C_Cpp.intelliSenseEngine": "default",
+    "files.associations": {
+        "stat.h": "c"
+    }
+}

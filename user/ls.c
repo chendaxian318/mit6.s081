@@ -43,6 +43,7 @@ ls(char *path)
 
   switch(st.type){
   case T_FILE:
+    printf("-----\n");
     printf("%s %d %d %l\n", fmtname(path), st.type, st.ino, st.size);
     break;
 
@@ -79,7 +80,8 @@ main(int argc, char *argv[])
     ls(".");
     exit(0);
   }
-  for(i=1; i<argc; i++)
+  for(i=1; i<argc; i++){
     ls(argv[i]);
+  }
   exit(0);
 }

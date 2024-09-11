@@ -105,6 +105,7 @@ extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_trace(void);
+extern uint64 sys_sysinfo(void);
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -129,6 +130,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace,
+[SYS_sysinfo] sys_sysinfo,
 };
 static char *call_nums[]={
   0,
@@ -153,6 +155,7 @@ static char *call_nums[]={
   "mkdir",
   "close",
   "trace",
+  "sysinfo",
 };
 void
 syscall(void)
@@ -167,7 +170,7 @@ syscall(void)
     //printf("num=%d mask=%d\n",num,p->trace_mask);
     if((1<<num)&(p->trace_mask)){
       char *s=0;
-      for(int i=1;i<22;i++){
+      for(int i=1;i<NELEM(syscalls);i++){
         if((1<<i)==(1<<num)){
           s=call_nums[i];
         }

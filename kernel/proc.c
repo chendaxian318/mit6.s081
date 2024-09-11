@@ -22,6 +22,7 @@ static void freeproc(struct proc *p);
 extern char trampoline[]; // trampoline.S
 
 // initialize the proc table at boot time.
+// 在启动时初始化proc表。
 void
 procinit(void)
 {
@@ -34,6 +35,9 @@ procinit(void)
       // Allocate a page for the process's kernel stack.
       // Map it high in memory, followed by an invalid
       // guard page.
+      // 为进程的内核堆栈分配一个页面。
+      // 将其映射到内存中的高位，然后是无效的
+      // 保护页面。
       char *pa = kalloc();
       if(pa == 0)
         panic("kalloc");
@@ -47,6 +51,9 @@ procinit(void)
 // Must be called with interrupts disabled,
 // to prevent race with process being moved
 // to a different CPU.
+// 必须在禁用中断的情况下调用，
+// 防止与正在移动的进程发生竞争
+// 到另一个CPU。
 int
 cpuid()
 {
@@ -56,6 +63,8 @@ cpuid()
 
 // Return this CPU's cpu struct.
 // Interrupts must be disabled.
+// 返回此CPU的CPU结构。
+// 必须禁用中断。
 struct cpu*
 mycpu(void) {
   int id = cpuid();
@@ -64,6 +73,7 @@ mycpu(void) {
 }
 
 // Return the current struct proc *, or zero if none.
+// 返回当前结构proc*，如果没有，则返回零。
 struct proc*
 myproc(void) {
   push_off();
@@ -89,6 +99,10 @@ allocpid() {
 // If found, initialize state required to run in the kernel,
 // and return with p->lock held.
 // If there are no free procs, or a memory allocation fails, return 0.
+// 在进程表中查找未使用的进程。
+// 如果找到，初始化在内核中运行所需的状态，
+// 并保持p->锁定状态返回。
+// 如果没有空闲进程，或者内存分配失败，则返回0。
 static struct proc*
 allocproc(void)
 {
@@ -108,6 +122,7 @@ found:
   p->pid = allocpid();
 
   // Allocate a trapframe page.
+  // 分配一个trapframe
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
     release(&p->lock);
     return 0;
@@ -123,6 +138,9 @@ found:
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
+  // 设置新的上下文以在forkret处开始执行，
+  // 其返回到用户空间。
+  
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
@@ -695,4 +713,18 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+uint64
+get_process_count(void){
+  struct proc *p=proc;
+  uint64 count=0;
+  
+  for(; p < &proc[NPROC]; p++) {
+     //acquire(&p->lock);
+    if(p->state != UNUSED) {
+      count++;
+    } 
+     //release(&p->lock);
+  } 
+  return count;
 }

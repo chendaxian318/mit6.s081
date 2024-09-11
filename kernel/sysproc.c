@@ -89,9 +89,19 @@ uint64
 sys_uptime(void)
 {
   uint xticks;
-
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+// 将信息存储到proc中，
+uint64
+sys_trace(void){
+  int mask;
+  acquire(&tickslock);
+  argint(0,(int*)&mask);
+  release(&tickslock);
+  myproc()->trace_mask=mask;
+  return mask;
 }

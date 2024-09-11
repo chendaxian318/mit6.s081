@@ -259,8 +259,8 @@ int
 fork(void)
 {
   int i, pid;
-  struct proc *np;
-  struct proc *p = myproc();
+  struct proc *np;  //np 为子进程的proc结构
+  struct proc *p = myproc();  // 获取父进程的
 
   // Allocate process.
   if((np = allocproc()) == 0){
@@ -276,6 +276,9 @@ fork(void)
   np->sz = p->sz;
 
   np->parent = p;
+
+  np->trace_mask=p->trace_mask;
+  
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);

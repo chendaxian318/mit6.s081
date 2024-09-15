@@ -440,3 +440,36 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+void            
+vmprint(pagetable_t pagetable){
+  // 打印根页表
+  printf("page table %p\n", pagetable);
+  // 重新写个函数是为了传递level级和递归
+  _vmprint(pagetable, 1);
+}
+
+void 
+_vmprint(pagetable_t pagetable, int level){
+  for(int i = 0; i < 512; i++){
+    pte_t pte = pagetable[i];
+    // 检查pte的有效性
+    if(pte & PTE_V ){
+      // this PTE points to a lower-level page table.
+      uint64 child = PTE2PA(pte);
+      // 打印树的深度
+      for(int j = 0; j < level; j++){
+        if(j==0){
+          printf("..");//第一个..前面不打印空格
+        }else{
+          printf(" ..");
+        }
+      }
+      printf("%d: pte %p pa %p\n",i,pte,child);
+      // 第三级页表存放的是物理地址，页表中页表项中W位，R位，X位起码有一位会被设置为1。如果是索引页表则这些值是0
+      if((pte & (PTE_R|PTE_W|PTE_X)) == 0){
+        _vmprint((pagetable_t)child,level+1);// 还没到第三级，继续递归。
+      }
+        
+    }
+  }
+}
